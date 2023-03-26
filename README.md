@@ -46,3 +46,10 @@ Prevent requests without valid authentication headers.
 
 Add your own domain name and have it point to the running services (try adding a subdomain name to point to the processing server)
 > !NOTE: Domain names are not included in AWS’ free tier and will incur a cost.
+
+
+### the endpoint URL elastic beanstalk: 
+http://image-filter-starter-code-dev.us-east-2.elasticbeanstalk.com/
+
+### import postman from cloud-cdnd-c2-project-final.postman_collection.json
+cloud-cdnd-c2-project-final.postman_collection.json

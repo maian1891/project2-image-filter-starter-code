@@ -1,16 +1,16 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import {filterImageFromURL, deleteLocalFiles} from './util/util';
+import express from "express";
+import bodyParser from "body-parser";
+import { filterImageFromURL, deleteLocalFiles, isValidUrl } from "./util/util";
 
 (async () => {
-
   // Init the Express application
   const app = express();
 
   // Set the network port
-  const port = process.env.PORT || 8082;
-  
+  const port = process.env.PORT || 8083;
+
   // Use the body parser middleware for post requests
+  app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
 
   // @TODO1 IMPLEMENT A RESTFUL ENDPOINT
@@ -29,18 +29,33 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
   /**************************************************************************** */
 
+  app.get("/filteredimage", async (req, res) => {
+    if (!isValidUrl(req.query.image_url)) {
+      return res.status(400).send({ auth: false, error: "url is invalid" });
+    }
+
+    await filterImageFromURL(req.query.image_url)
+      .then(async (filteredpath) => {
+        res.status(200).sendFile(filteredpath);
+        res.on('success', () => deleteLocalFiles([filteredpath]));
+      })
+      .catch((error) => {
+        res.status(500).send({ auth: false, error: error.message });
+      });
+  });
+
   //! END @TODO1
-  
+
   // Root Endpoint
   // Displays a simple message to the user
-  app.get( "/", async ( req, res ) => {
-    res.send("try GET /filteredimage?image_url={{}}")
-  } );
-  
+  app.get("/", async (req, res) => {
+    res.send("try GET /filteredimage?image_url={{}}");
+  });
 
   // Start the Server
-  app.listen( port, () => {
-      console.log( `server running http://localhost:${ port }` );
-      console.log( `press CTRL+C to stop server` );
-  } );
+  app.listen(port, () => {
+    console.log(`server running http://localhost:${port}`);
+    console.log(`press CTRL+C to stop server`);
+  });
 })();
+
